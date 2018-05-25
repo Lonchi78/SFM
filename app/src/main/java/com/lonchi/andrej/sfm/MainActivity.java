@@ -1,5 +1,7 @@
 package com.lonchi.andrej.sfm;
 
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
@@ -17,6 +19,12 @@ public class MainActivity extends AppCompatActivity {
         //  Set Toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mainToolbar);
+
+        //  Load Fragment
+        FragmentManager fm = this.getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        FragmentBrowser fragmentBrowser = new FragmentBrowser();
+        ft.replace(R.id.container, fragmentBrowser ).commit();
     }
 
 
