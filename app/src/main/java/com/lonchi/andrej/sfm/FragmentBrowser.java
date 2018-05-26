@@ -29,10 +29,12 @@ public class FragmentBrowser extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View viewBrowser = inflater.inflate(R.layout.layout_browser ,null);
 
+        //  Set Recyclerview
         recyclerView = viewBrowser.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        //  Fill Recyclerview with items
         listItems = new ArrayList<>();
         for (int i=0; i<10; i++){
             ListItem newItem = new ListItem(
@@ -43,22 +45,9 @@ public class FragmentBrowser extends Fragment{
             listItems.add(newItem);
         }
 
+        //  Set Adapter for Recyclerview
         adapter = new AdapterRecyclerView(listItems, getContext());
         recyclerView.setAdapter(adapter);
-
-        recyclerView.addOnItemTouchListener(
-                new ClickListenerRecyclerView(getContext(), recyclerView ,new ClickListenerRecyclerView.OnItemClickListener() {
-                    public void onItemClick(View view, int position) {
-                        // do whatever
-                        Toast.makeText(getContext(), "onClick " + position, Toast.LENGTH_LONG).show();
-                    }
-
-                    public void onLongItemClick(View view, int position) {
-                        // do whatever
-                        Toast.makeText(getContext(), "onLongClick " + position, Toast.LENGTH_LONG).show();
-                    }
-                })
-        );
 
         return viewBrowser;
     }
