@@ -23,18 +23,17 @@
             android:padding="8dp">
 
             <ImageView
+                android:id="@+id/item_iv_type"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:padding="5dp"
-                android:src="@drawable/ic_settings"
-                android:tint="@color/colorAccent"
-                android:id="@+id/imageView" />
+                android:src="@drawable/ic_settings" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_toEndOf="@+id/imageView"
+                android:layout_toEndOf="@+id/item_iv_type"
                 android:id="@+id/relativeLayout">
 
             </RelativeLayout>

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,9 +46,34 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
         //  Get specific ListItem from all ListItems
         ListItem listItem = listItems.get(position);
 
-        //  Set values for specific ListItem
-        holder.textviewName.setText(listItem.getItemName());
-        holder.textViewSize.setText(listItem.getItemSize());
+        //  Get values
+        String itemName = listItem.getItemName();
+        String itemSize = listItem.getItemSize();
+        String itemType = listItem.getItemType();
+
+        //  Set UI with values of specific Item
+        holder.textViewName.setText( itemName );
+        if( itemType.equals("DIR") ){
+            if( itemSize.equals("0") ){
+                holder.textViewSize.setText( itemSize + " item" );
+                holder.imageViewType.setImageResource(R.drawable.ic_folder_empty);
+            } else if( itemSize.equals("1") ){
+                holder.textViewSize.setText( itemSize + " item" );
+                holder.imageViewType.setImageResource(R.drawable.ic_folder_fill);
+            }else{
+                holder.textViewSize.setText( itemSize + " items" );
+                holder.imageViewType.setImageResource(R.drawable.ic_folder_fill);
+            }
+        }
+        if( itemType.equals("FILE") ){
+            if( itemSize.equals("0") || itemSize.equals("1") ){
+                holder.textViewSize.setText( itemSize + " Byte" );
+                holder.imageViewType.setImageResource(R.drawable.ic_file);
+            }else{
+                holder.textViewSize.setText( itemSize + " Bytes" );
+                holder.imageViewType.setImageResource(R.drawable.ic_file);
+            }
+        }
     }
 
     @Override
@@ -59,8 +85,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         //  Declaration of used UI elements in Card (list_item.xml)
-        public TextView textviewName;
+        public TextView textViewName;
         public TextView textViewSize;
+        public ImageView imageViewType;
         public CardView cardView;
 
         //  Handle selected items (onLongClicked)
@@ -70,8 +97,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
             super(itemView);
 
             //  Assigning UI elements
-            textviewName = (TextView) itemView.findViewById(R.id.item_tv_name);
+            textViewName = (TextView) itemView.findViewById(R.id.item_tv_name);
             textViewSize = (TextView) itemView.findViewById(R.id.item_tv_size);
+            imageViewType = (ImageView) itemView.findViewById(R.id.item_iv_type);
             cardView = (CardView) itemView.findViewById(R.id.card_item);
 
             //  Set click listeners
@@ -97,6 +125,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
                 selectedItems.put(getAdapterPosition(), true);
                 cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.item_bg_highlight));
             }
+
+            //  TRUE -> without onClick
+            //  FALSE -> accept also onClick
             return true;
         }
     }
