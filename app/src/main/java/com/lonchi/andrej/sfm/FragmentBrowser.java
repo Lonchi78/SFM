@@ -1,20 +1,25 @@
 package com.lonchi.andrej.sfm;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -23,46 +28,48 @@ import java.util.List;
 
 public class FragmentBrowser extends Fragment{
 
+    private String currentDirPath;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
 
-    private List<ListItem> listItems;
-    private List<ListItem> dirList = new ArrayList<>();
-    private List<ListItem> fileList = new ArrayList<>();
+    public List<ListItem> dirList = new ArrayList<>();
+    public List<ListItem> fileList = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View viewBrowser = inflater.inflate(R.layout.layout_browser ,null);
 
+        //  Get arguments
+        currentDirPath = Environment.getExternalStorageDirectory().getPath();
+        Bundle bundleImport = this.getArguments();
+        if (bundleImport != null) {
+            currentDirPath = bundleImport.getString("dirName", currentDirPath);
+        }
+
         //  Set Recyclerview
         recyclerView = viewBrowser.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        /*
-        //  Fill Recyclerview with items
-        listItems = new ArrayList<>();
-        for (int i=0; i<10; i++){
-            ListItem newItem = new ListItem(
-                    "Filename" + (i+1),
-                    ((i+1)*5) + "MB"
-            );
-
-            listItems.add(newItem);
-        }
-        */
-
+        //  Fill ArrayLists
         dirList = new ArrayList<>();
         fileList = new ArrayList<>();
-        File currentDir = new File(Environment.getExternalStorageDirectory().getPath());
+        File currentDir = new File( currentDirPath );
         fill(currentDir);
 
         //  Set Adapter for Recyclerview
-        adapter = new AdapterRecyclerView(dirList, getContext());
+        adapter = new AdapterRecyclerView(dirList, getContext(), FragmentBrowser.this);
         recyclerView.setAdapter(adapter);
 
         return viewBrowser;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //  Update current dir path
+        ((MainActivity)getActivity()).updateCurrentDirPath(currentDirPath);
     }
 
     private void fill(File f) {
@@ -100,36 +107,62 @@ public class FragmentBrowser extends Fragment{
         Collections.sort(dirList);
         Collections.sort(fileList);
 
-        //  Connext ArrayLists to one
+        //  Connect ArrayLists to one
         dirList.addAll(fileList);
+
+        //  Add parent directory
         if(!f.getName().equalsIgnoreCase("sdcard")){
             dirList.add(0,new ListItem("..","Parent Directory", "DIR" ) );
         }
+
     }
 
-    /*
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        // TODO Auto-generated method stub
-        super.onListItemClick(l, v, position, id);
-        Item o = adapter.getItem(position);
-        if(o.getImage().equalsIgnoreCase("directory_icon")||o.getImage().equalsIgnoreCase("directory_up")){
-            currentDir = new File(o.getPath());
-            fill(currentDir);
-        }
-        else
-        {
-            onFileClick(o);
+    public void openDir(String dirName){
+        //  Open new directory
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        FragmentBrowser fragmentBrowser = new FragmentBrowser();
+        Bundle bundleExport = new Bundle();
+
+        //  Make dirPath
+        String nextDirPath;
+        if( dirName.equals("..") ){
+            //  Move UP in tree
+
+            File tmp = new File(currentDirPath);
+            nextDirPath = tmp.getParent();
+            bundleExport.putString("dirName", nextDirPath);
+            fragmentBrowser.setArguments(bundleExport);
+            getActivity().getSupportFragmentManager().popBackStack();
+            ft.replace(R.id.container, fragmentBrowser ).commit();
+
+        }else{
+            // Move DOWN in tree
+
+            nextDirPath = currentDirPath + File.separator + dirName;
+            bundleExport.putString("dirName", nextDirPath);
+            fragmentBrowser.setArguments(bundleExport);
+            ft.replace(R.id.container, fragmentBrowser ).commit();
         }
     }
-    private void onFileClick(Item o)
-    {
-        //Toast.makeText(this, "Folder Clicked: "+ currentDir, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent();
-        intent.putExtra("GetPath",currentDir.toString());
-        intent.putExtra("GetFileName",o.getName());
-        setResult(RESULT_OK, intent);
-        finish();
+
+    public void openFile(String fileName){
+        //  Try to open selected file
+        File selectedFile = new File(currentDirPath + File.separator + fileName);
+
+        //  Get preferred app to open this type of file
+        Intent myIntent = new Intent(Intent.ACTION_VIEW);
+        String mime = null;
+        try {
+            mime = URLConnection.guessContentTypeFromStream(new FileInputStream(selectedFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if( mime == null ) {
+            mime=URLConnection.guessContentTypeFromName(selectedFile.getName());
+        }
+        myIntent.setDataAndType(Uri.fromFile(selectedFile), mime);
+        startActivity(myIntent);
     }
-    */
+
 }

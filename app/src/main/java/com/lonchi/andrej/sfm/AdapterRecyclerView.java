@@ -2,6 +2,7 @@ package com.lonchi.andrej.sfm;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -25,11 +26,13 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
     private List<ListItem> listItems;
     private Context context;
+    private FragmentBrowser fragmentBrowser;
 
     //  Constructor
-    public AdapterRecyclerView(List<ListItem> listItems, Context context) {
+    public AdapterRecyclerView(List<ListItem> listItems, Context context, FragmentBrowser fragmentBrowser) {
         this.listItems = listItems;
         this.context = context;
+        this.fragmentBrowser = fragmentBrowser;
     }
 
     @Override
@@ -109,8 +112,18 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(context, "onClick", Toast.LENGTH_LONG).show();
+            //  Get info of selected item
+            int position = getAdapterPosition();
+            String fileType = listItems.get(position).getItemType();
+            String fileName = listItems.get(position).getItemName();
 
+            if( fileType.equals("DIR") ){
+                fragmentBrowser.openDir( fileName );
+            }else if ( fileType.equals("FILE") ){
+                fragmentBrowser.openFile( fileName );
+            }else{
+                Toast.makeText(context, R.string.unknow_file, Toast.LENGTH_LONG).show();
+            }
         }
 
         @Override

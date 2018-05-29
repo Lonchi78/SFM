@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">SFM</string>
+
     <string name="refresh">Refresh</string>
     <string name="settings">Settings</string>
+
     <string name="filename">FileFun.txt</string>
     <string name="filesize">26.7 MB</string>
+    <string name="unknow_file">Ooops. Unspecified file!</string>
 </resources>

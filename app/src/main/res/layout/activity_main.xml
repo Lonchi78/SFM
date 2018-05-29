@@ -17,6 +17,16 @@
         android:background="?attr/colorPrimary">
     </android.support.v7.widget.Toolbar>
 
+    <TextView
+        android:id="@+id/tv_current_dir"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="?attr/colorPrimary"
+        android:textColor="@color/item_bg"
+        android:textSize="15sp"
+        android:text="@string/filename"/>
+
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
