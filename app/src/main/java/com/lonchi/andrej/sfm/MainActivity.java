@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,17 +32,15 @@ public class MainActivity extends AppCompatActivity {
         //  Set Toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mainToolbar);
+        mainToolbar.setTitle(R.string.app_name_long);
+        mainToolbar.setTitleTextColor(ContextCompat.getColor(getApplicationContext(), R.color.toolbar_text));
+        if( getSupportActionBar() != null ){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         //  Load Fragment
-        FragmentManager fm = this.getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        FragmentBrowser fragmentBrowser = new FragmentBrowser();
-        //  TODO
-        //  Iba SDCard ??
-        Bundle bundleExport = new Bundle();
-        bundleExport.putString("dirName", Environment.getExternalStorageDirectory().getPath());
-        fragmentBrowser.setArguments(bundleExport);
-        ft.replace(R.id.container, fragmentBrowser ).commit();
+        loadFragment();
     }
 
 
@@ -54,22 +53,45 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        FragmentBrowser fragment;
         //  Handle action buttons clicks
         switch (item.getItemId()) {
+            case android.R.id.home:
+                //  Back arrow, finish current fragment
+                fragment = (FragmentBrowser) getSupportFragmentManager().findFragmentById(R.id.container);
+                fragment.needRefresh = true;
+                fragment.openDir("..");
+                break;
+
             case R.id.abRefresh:
-                Toast.makeText(this, "Refresh selected", Toast.LENGTH_SHORT)
-                        .show();
+                //  Refresh List of Items
+                fragment = (FragmentBrowser) getSupportFragmentManager().findFragmentById(R.id.container);
+                fragment.needRefresh = true;
+                fragment.updateList();
                 break;
 
             case R.id.abSettings:
-                Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT)
-                        .show();
+                //  Open Default Path
+                loadFragment();
                 break;
 
             default:
                 break;
         }
         return true;
+    }
+
+    private void loadFragment(){
+        //  Load Fragment
+        FragmentManager fm = this.getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        FragmentBrowser fragmentBrowser = new FragmentBrowser();
+        //  TODO
+        //  Iba SDCard ??
+        Bundle bundleExport = new Bundle();
+        bundleExport.putString("dirName", Environment.getExternalStorageDirectory().getPath());
+        fragmentBrowser.setArguments(bundleExport);
+        ft.replace(R.id.container, fragmentBrowser ).commit();
     }
 
     public void updateCurrentDirPath(String dirPath){

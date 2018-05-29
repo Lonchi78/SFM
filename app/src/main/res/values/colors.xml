@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">@color/x_yellow</color>
+    <color name="colorPrimaryDark">@color/x_yellow_dark</color>
+    <color name="colorAccent">@color/x_black</color>
 
-    <color name="item_bg">#FCFCFC</color>
-    <color name="item_bg_highlight">#5EB1BF</color>
+    <color name="toolbar_text">@color/x_black</color>
+    <color name="item_text">@color/x_black_light</color>
+    <color name="item_bg">@color/x_grey</color>
+    <color name="item_bg_highlight">@color/x_yellow_light</color>
+    <color name="frame_bg">@color/x_white</color>
+
+    <color name="x_yellow">#F3D338</color>
+    <color name="x_yellow_dark">#F2CD18</color>
+    <color name="x_yellow_light">#F2E291</color>
+    <color name="x_white">#FEFEFE</color>
+    <color name="x_grey">#F7F7F7</color>
+    <color name="x_black">#2D2D2D</color>
+    <color name="x_black_light">#4C4C4C</color>
 </resources>

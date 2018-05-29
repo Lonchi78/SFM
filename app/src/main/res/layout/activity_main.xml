@@ -8,27 +8,41 @@
     android:layout_height="match_parent"
     tools:context="com.lonchi.andrej.sfm.MainActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:minHeight="?attr/actionBarSize"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleTextColor="@android:color/white"
-        android:background="?attr/colorPrimary">
-    </android.support.v7.widget.Toolbar>
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_current_dir"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            app:theme="@style/toolbar_custom_color_arrow"
+            android:minHeight="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleTextColor="@android:color/white"
+            android:background="?attr/colorPrimary">
+        </android.support.v7.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/tv_current_dir"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="?attr/colorPrimary"
+            android:textColor="@color/toolbar_text"
+            android:textSize="15sp"
+            android:text="@string/filename"/>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/toolbar_shadow"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:background="?attr/colorPrimary"
-        android:textColor="@color/item_bg"
-        android:textSize="15sp"
-        android:text="@string/filename"/>
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_dropshadow" />
 
     <FrameLayout
         android:id="@+id/container"
+        android:background="@color/frame_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </FrameLayout>
