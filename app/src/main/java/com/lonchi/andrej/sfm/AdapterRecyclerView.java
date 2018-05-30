@@ -4,10 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,9 +29,52 @@ import java.util.List;
 
 public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> {
 
+    //  CAB variables
+    private ActionMode mActionMode;
+    private boolean multiSelect = false;
+    private ArrayList<ListItem> selectedItems = new ArrayList<>();
+
+    //  RecyclerViewAdapter variables
     private List<ListItem> listItems;
     private Context context;
     private FragmentBrowser fragmentBrowser;
+
+    //  CAB override methods
+    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            //  Open CAB -> load menu
+            multiSelect = true;
+            mode.getMenuInflater().inflate(R.menu.contextual_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            //  Handle action buttons click
+            if( item.getItemId() == R.id.cabDelete ){
+                for (ListItem intItem : selectedItems) {
+                    listItems.remove(intItem);
+                }
+                mode.finish();
+            }
+
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            //  Close CAB -> clear and update
+            multiSelect = false;
+            selectedItems.clear();
+            notifyDataSetChanged();
+        }
+    };
 
     //  Constructor
     public AdapterRecyclerView(List<ListItem> listItems, Context context, FragmentBrowser fragmentBrowser) {
@@ -77,6 +125,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
                 holder.imageViewType.setImageResource(R.drawable.ic_file);
             }
         }
+
+        //  Update item selected state
+        holder.update(listItems.get(position));
     }
 
     @Override
@@ -85,7 +136,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
         return listItems.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder  {
 
         //  Declaration of used UI elements in Card (list_item.xml)
         public TextView textViewName;
@@ -93,8 +144,6 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
         public ImageView imageViewType;
         public CardView cardView;
 
-        //  Handle selected items (onLongClicked)
-        private SparseBooleanArray selectedItems = new SparseBooleanArray();
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -104,44 +153,98 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
             textViewSize = (TextView) itemView.findViewById(R.id.item_tv_size);
             imageViewType = (ImageView) itemView.findViewById(R.id.item_iv_type);
             cardView = (CardView) itemView.findViewById(R.id.card_item);
-
-            //  Set click listeners
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
-        @Override
-        public void onClick(View view) {
-            //  Get info of selected item
-            int position = getAdapterPosition();
-            String fileType = listItems.get(position).getItemType();
-            String fileName = listItems.get(position).getItemName();
+        void selectItem(ListItem item) {
+            // Click on Item while is CAB open
 
-            if( fileType.equals("DIR") ){
-                fragmentBrowser.openDir( fileName );
-            }else if ( fileType.equals("FILE") ){
-                fragmentBrowser.openFile( fileName );
-            }else{
-                Toast.makeText(context, R.string.unknow_file, Toast.LENGTH_LONG).show();
-            }
-        }
+            if (selectedItems.contains(item)) {
+                //  Item is selected yet -> unselect item
 
-        @Override
-        public boolean onLongClick(View view) {
-            if (selectedItems.get(getAdapterPosition(), false)) {
-                //  Item is already selected -> unselect item
-                selectedItems.delete(getAdapterPosition());
-                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.item_bg));
-            }
-            else {
-                //  Item is not selected -> select item
-                selectedItems.put(getAdapterPosition(), true);
+                if( selectedItems.size() == 1 ){
+                    //  This was the last selected item -> close CAB
+                    selectedItems.remove(item);
+                    cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.item_bg));
+                    if( mActionMode != null ){
+                        mActionMode.finish();
+                    }
+
+                }else{
+                    //  CAB stays open
+                    selectedItems.remove(item);
+                    cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.item_bg));
+                }
+
+            } else {
+                //  Item is not selected yet -> select item
+                selectedItems.add(item);
                 cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.item_bg_highlight));
             }
+        }
 
-            //  TRUE -> without onClick
-            //  FALSE -> accept also onClick
-            return true;
+        void update(final ListItem value) {
+            //  Correct Item highlight
+            if (selectedItems.contains(value)) {
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.item_bg_highlight));
+            } else {
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.item_bg));
+            }
+
+            //  Long click on Item
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    //  Unable to select Parent Folder
+                    if( listItems.get( getAdapterPosition() ).getItemType().equals("DIR") &&
+                            listItems.get( getAdapterPosition() ).getItemName().equals("..") ){
+                        return true;
+                    }
+
+                    //  Is CAB already open?
+                    if( !multiSelect ){
+                        //  First selected item -> open CAB
+                        mActionMode = ((AppCompatActivity)view.getContext()).startSupportActionMode(actionModeCallbacks);
+                    }
+                    //  ELSE => CAB is already open -> just add item
+                    selectItem(value);
+
+                    return true;
+                }
+            });
+
+            //  Normal click on Item
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //  Is CAB on?
+                    if( multiSelect ){
+                        //  Unable to select Parent Folder
+                        if( listItems.get( getAdapterPosition() ).getItemType().equals("DIR") &&
+                                listItems.get( getAdapterPosition() ).getItemName().equals("..") ){
+                            return;
+                        }
+
+                        //  CAB on -> Let's select items
+                        selectItem(value);
+
+                    }else{
+                        //  CAB of -> Open file / folder
+
+                        //  Get info of selected item
+                        int position = getAdapterPosition();
+                        String fileType = listItems.get(position).getItemType();
+                        String fileName = listItems.get(position).getItemName();
+
+                        if( fileType.equals("DIR") ){
+                            fragmentBrowser.openDir( fileName );
+                        }else if ( fileType.equals("FILE") ){
+                            fragmentBrowser.openFile( fileName );
+                        }else{
+                            Toast.makeText(context, R.string.unknow_file, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            });
         }
     }
 }

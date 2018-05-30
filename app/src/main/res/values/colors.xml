@@ -6,12 +6,12 @@
 
     <color name="toolbar_text">@color/x_black</color>
     <color name="item_text">@color/x_black_light</color>
-    <color name="item_bg">@color/x_grey</color>
+    <color name="item_bg">@color/x_white</color>
     <color name="item_bg_highlight">@color/x_yellow_light</color>
-    <color name="frame_bg">@color/x_white</color>
+    <color name="frame_bg">@color/x_grey</color>
 
     <color name="x_yellow">#F3D338</color>
-    <color name="x_yellow_dark">#F2CD18</color>
+    <color name="x_yellow_dark">#F7CE04</color>
     <color name="x_yellow_light">#F2E291</color>
     <color name="x_white">#FEFEFE</color>
     <color name="x_grey">#F7F7F7</color>

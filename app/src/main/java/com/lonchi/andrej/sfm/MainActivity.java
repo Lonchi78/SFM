@@ -1,21 +1,15 @@
 package com.lonchi.andrej.sfm;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -86,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fm = this.getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         FragmentBrowser fragmentBrowser = new FragmentBrowser();
-        //  TODO
-        //  Iba SDCard ??
         Bundle bundleExport = new Bundle();
         bundleExport.putString("dirName", Environment.getExternalStorageDirectory().getPath());
         fragmentBrowser.setArguments(bundleExport);
