@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
             if( item.getItemId() == R.id.cabDelete ){
                 for (ListItem intItem : selectedItems) {
                     listItems.remove(intItem);
+                    fragmentBrowser.deleteFile(intItem);
                 }
                 mode.finish();
             }

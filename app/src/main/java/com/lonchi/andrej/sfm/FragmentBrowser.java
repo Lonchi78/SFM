@@ -2,6 +2,7 @@ package com.lonchi.andrej.sfm;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -62,7 +64,15 @@ public class FragmentBrowser extends Fragment{
         //  Set Recyclerview
         recyclerView = viewBrowser.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        if(getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // code to do for Portrait Mode
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        } else {
+            // code to do for Landscape Mode
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+
+        }
 
         //  Declare ArrayLists
         dirList = new ArrayList<>();
@@ -302,5 +312,12 @@ public class FragmentBrowser extends Fragment{
         }
 
         return abstractPath;
+    }
+
+    public boolean deleteFile(ListItem item){
+        //  Delete selected item
+        File tmpFile = new File(currentDirPath + File.separator + item.getItemName());
+        boolean deleted = tmpFile.delete();
+        return deleted;
     }
 }
