@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         loadFragment();
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //  Set menu for toolbar
@@ -53,20 +52,23 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 //  Back arrow, finish current fragment
                 fragment = (FragmentBrowser) getSupportFragmentManager().findFragmentById(R.id.container);
-                fragment.needRefresh = true;
+                fragment.NEED_REFRESH = true;
                 fragment.openDir("..");
                 break;
 
             case R.id.abRefresh:
                 //  Refresh List of Items
                 fragment = (FragmentBrowser) getSupportFragmentManager().findFragmentById(R.id.container);
-                fragment.needRefresh = true;
+                fragment.NEED_REFRESH = true;
                 fragment.updateList();
                 break;
 
             case R.id.abSettings:
                 //  Open Default Path
-                loadFragment();
+                fragment = (FragmentBrowser) getSupportFragmentManager().findFragmentById(R.id.container);
+                fragment.NEED_REFRESH = true;
+                fragment.AB_SETTINGS = true;
+                fragment.openDir("..");
                 break;
 
             default:
